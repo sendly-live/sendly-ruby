@@ -4,22 +4,15 @@ Official Ruby SDK for the Sendly SMS API.
 
 ## Installation
 
-Add to your Gemfile:
-
-```ruby
-gem 'sendly'
-```
-
-Then run:
-
 ```bash
-bundle install
-```
-
-Or install directly:
-
-```bash
+# gem
 gem install sendly
+
+# Bundler (add to Gemfile)
+gem 'sendly'
+
+# then run
+bundle install
 ```
 
 ## Quick Start
