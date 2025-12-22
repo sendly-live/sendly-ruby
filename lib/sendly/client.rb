@@ -45,6 +45,20 @@ module Sendly
       @messages ||= Messages.new(self)
     end
 
+    # Access the Webhooks resource
+    #
+    # @return [Sendly::WebhooksResource]
+    def webhooks
+      @webhooks ||= WebhooksResource.new(self)
+    end
+
+    # Access the Account resource
+    #
+    # @return [Sendly::AccountResource]
+    def account
+      @account ||= AccountResource.new(self)
+    end
+
     # Make a GET request
     #
     # @param path [String] API path
@@ -61,6 +75,15 @@ module Sendly
     # @return [Hash] Response body
     def post(path, body = {})
       request(:post, path, body: body)
+    end
+
+    # Make a PATCH request
+    #
+    # @param path [String] API path
+    # @param body [Hash] Request body
+    # @return [Hash] Response body
+    def patch(path, body = {})
+      request(:patch, path, body: body)
     end
 
     # Make a DELETE request
@@ -137,6 +160,8 @@ module Sendly
               Net::HTTP::Get.new(uri)
             when :post
               Net::HTTP::Post.new(uri)
+            when :patch
+              Net::HTTP::Patch.new(uri)
             when :delete
               Net::HTTP::Delete.new(uri)
             else

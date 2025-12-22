@@ -9,6 +9,8 @@ require_relative "sendly/types"
 require_relative "sendly/client"
 require_relative "sendly/messages"
 require_relative "sendly/webhooks"
+require_relative "sendly/webhooks_resource"
+require_relative "sendly/account_resource"
 
 # Sendly Ruby SDK
 #
