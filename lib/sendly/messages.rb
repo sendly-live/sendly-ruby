@@ -14,6 +14,7 @@ module Sendly
     #
     # @param to [String] Recipient phone number in E.164 format
     # @param text [String] Message content (max 1600 characters)
+    # @param message_type [String] Message type: "marketing" (default) or "transactional"
     # @return [Sendly::Message] The sent message
     #
     # @raise [Sendly::ValidationError] If parameters are invalid
@@ -27,11 +28,21 @@ module Sendly
     #   )
     #   puts message.id
     #   puts message.status
-    def send(to:, text:)
+    #
+    # @example Transactional message (bypasses quiet hours)
+    #   message = client.messages.send(
+    #     to: "+15551234567",
+    #     text: "Your verification code is 123456",
+    #     message_type: "transactional"
+    #   )
+    def send(to:, text:, message_type: nil)
       validate_phone!(to)
       validate_text!(text)
 
-      response = client.post("/messages", { to: to, text: text })
+      body = { to: to, text: text }
+      body[:messageType] = message_type if message_type
+
+      response = client.post("/messages", body)
       # API returns message directly at top level
       Message.new(response)
     end
@@ -117,6 +128,7 @@ module Sendly
     # @param text [String] Message content (max 1600 characters)
     # @param scheduled_at [String] ISO 8601 datetime for when to send
     # @param from [String] Sender ID or phone number (optional)
+    # @param message_type [String] Message type: "marketing" (default) or "transactional"
     # @return [Hash] The scheduled message
     #
     # @raise [Sendly::ValidationError] If parameters are invalid
@@ -128,13 +140,14 @@ module Sendly
     #     scheduled_at: "2025-01-20T10:00:00Z"
     #   )
     #   puts scheduled["id"]
-    def schedule(to:, text:, scheduled_at:, from: nil)
+    def schedule(to:, text:, scheduled_at:, from: nil, message_type: nil)
       validate_phone!(to)
       validate_text!(text)
       raise ValidationError, "scheduled_at is required" if scheduled_at.nil? || scheduled_at.empty?
 
       body = { to: to, text: text, scheduledAt: scheduled_at }
       body[:from] = from if from
+      body[:messageType] = message_type if message_type
 
       client.post("/messages/schedule", body)
     end
@@ -198,6 +211,7 @@ module Sendly
     #
     # @param messages [Array<Hash>] Array of messages with :to and :text keys
     # @param from [String] Sender ID or phone number (optional, applies to all)
+    # @param message_type [String] Message type: "marketing" (default) or "transactional"
     # @return [Hash] Batch response with batch_id and status
     #
     # @raise [Sendly::ValidationError] If parameters are invalid
@@ -211,7 +225,7 @@ module Sendly
     #     ]
     #   )
     #   puts "Batch #{result['batchId']}: #{result['queued']} queued"
-    def send_batch(messages:, from: nil)
+    def send_batch(messages:, from: nil, message_type: nil)
       raise ValidationError, "Messages array is required" if messages.nil? || messages.empty?
 
       messages.each_with_index do |msg, i|
@@ -226,6 +240,7 @@ module Sendly
 
       body = { messages: messages }
       body[:from] = from if from
+      body[:messageType] = message_type if message_type
 
       client.post("/messages/batch", body)
     end
