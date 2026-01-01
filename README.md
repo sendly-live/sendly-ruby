@@ -135,6 +135,55 @@ puts message.status
 puts message.delivered_at
 ```
 
+### Scheduling Messages
+
+```ruby
+# Schedule a message for future delivery
+scheduled = client.messages.schedule(
+  to: "+15551234567",
+  text: "Your appointment is tomorrow!",
+  scheduled_at: "2025-01-15T10:00:00Z"
+)
+
+puts scheduled.id
+puts scheduled.scheduled_at
+
+# List scheduled messages
+result = client.messages.list_scheduled
+result.data.each { |msg| puts "#{msg.id}: #{msg.scheduled_at}" }
+
+# Get a specific scheduled message
+msg = client.messages.get_scheduled("sched_xxx")
+
+# Cancel a scheduled message (refunds credits)
+result = client.messages.cancel_scheduled("sched_xxx")
+puts "Refunded: #{result.credits_refunded} credits"
+```
+
+### Batch Messages
+
+```ruby
+# Send multiple messages in one API call (up to 1000)
+batch = client.messages.send_batch(
+  messages: [
+    { to: "+15551234567", text: "Hello User 1!" },
+    { to: "+15559876543", text: "Hello User 2!" },
+    { to: "+15551112222", text: "Hello User 3!" }
+  ]
+)
+
+puts batch.batch_id
+puts "Queued: #{batch.queued}"
+puts "Failed: #{batch.failed}"
+puts "Credits used: #{batch.credits_used}"
+
+# Get batch status
+status = client.messages.get_batch("batch_xxx")
+
+# List all batches
+batches = client.messages.list_batches
+```
+
 ### Iterate All Messages
 
 ```ruby
@@ -146,6 +195,66 @@ end
 # With filters
 client.messages.each(status: "delivered") do |message|
   puts "Delivered: #{message.id}"
+end
+```
+
+## Webhooks
+
+```ruby
+# Create a webhook endpoint
+webhook = client.webhooks.create(
+  url: "https://example.com/webhooks/sendly",
+  events: ["message.delivered", "message.failed"]
+)
+
+puts webhook.id
+puts webhook.secret  # Store securely!
+
+# List all webhooks
+webhooks = client.webhooks.list
+
+# Get a specific webhook
+wh = client.webhooks.get("whk_xxx")
+
+# Update a webhook
+client.webhooks.update("whk_xxx",
+  url: "https://new-endpoint.example.com/webhook",
+  events: ["message.delivered", "message.failed", "message.sent"]
+)
+
+# Test a webhook
+result = client.webhooks.test("whk_xxx")
+
+# Rotate webhook secret
+rotation = client.webhooks.rotate_secret("whk_xxx")
+
+# Delete a webhook
+client.webhooks.delete("whk_xxx")
+```
+
+## Account & Credits
+
+```ruby
+# Get account information
+account = client.account.get
+puts account.email
+
+# Check credit balance
+credits = client.account.get_credits
+puts "Available: #{credits.available_balance} credits"
+puts "Reserved: #{credits.reserved_balance} credits"
+puts "Total: #{credits.balance} credits"
+
+# View credit transaction history
+result = client.account.get_credit_transactions
+result.data.each do |tx|
+  puts "#{tx.type}: #{tx.amount} credits - #{tx.description}"
+end
+
+# List API keys
+result = client.account.list_api_keys
+result.data.each do |key|
+  puts "#{key.name}: #{key.prefix}*** (#{key.type})"
 end
 ```
 
