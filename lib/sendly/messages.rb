@@ -282,6 +282,44 @@ module Sendly
       client.get("/messages/batches", params.compact)
     end
 
+    # Preview a batch without sending (dry run)
+    #
+    # @param messages [Array<Hash>] Array of messages with :to and :text keys
+    # @param from [String] Sender ID or phone number (optional, applies to all)
+    # @param message_type [String] Message type: "marketing" (default) or "transactional"
+    # @return [Hash] Preview showing what would happen if batch was sent
+    #
+    # @raise [Sendly::ValidationError] If parameters are invalid
+    #
+    # @example
+    #   preview = client.messages.preview_batch(
+    #     messages: [
+    #       { to: "+15551234567", text: "Hello Alice!" },
+    #       { to: "+15559876543", text: "Hello Bob!" }
+    #     ]
+    #   )
+    #   puts "Can send: #{preview['canSend']}"
+    #   puts "Credits needed: #{preview['creditsNeeded']}"
+    def preview_batch(messages:, from: nil, message_type: nil)
+      raise ValidationError, "Messages array is required" if messages.nil? || messages.empty?
+
+      messages.each_with_index do |msg, i|
+        raise ValidationError, "Message at index #{i} missing 'to'" unless msg[:to] || msg["to"]
+        raise ValidationError, "Message at index #{i} missing 'text'" unless msg[:text] || msg["text"]
+
+        to = msg[:to] || msg["to"]
+        text = msg[:text] || msg["text"]
+        validate_phone!(to)
+        validate_text!(text)
+      end
+
+      body = { messages: messages }
+      body[:from] = from if from
+      body[:messageType] = message_type if message_type
+
+      client.post("/messages/batch/preview", body)
+    end
+
     private
 
     def validate_phone!(phone)

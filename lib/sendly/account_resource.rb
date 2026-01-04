@@ -66,5 +66,33 @@ module Sendly
     def api_key_usage(key_id)
       @client.get("/keys/#{key_id}/usage")
     end
+
+    # Create a new API key
+    #
+    # @param name [String] Display name for the API key
+    # @param expires_at [String, nil] Optional expiration date (ISO 8601)
+    # @return [Hash] Contains 'apiKey' (metadata) and 'key' (full secret - only shown once!)
+    #
+    # @example
+    #   result = client.account.create_api_key("Production")
+    #   puts "Save this key: #{result['key']}"  # Only shown once!
+    def create_api_key(name, expires_at: nil)
+      raise ArgumentError, "API key name is required" if name.nil? || name.empty?
+
+      body = { name: name }
+      body[:expiresAt] = expires_at if expires_at
+
+      @client.post("/account/keys", body)
+    end
+
+    # Revoke an API key
+    #
+    # @param key_id [String] API key ID to revoke
+    # @return [void]
+    def revoke_api_key(key_id)
+      raise ArgumentError, "API key ID is required" if key_id.nil? || key_id.empty?
+
+      @client.delete("/account/keys/#{key_id}")
+    end
   end
 end

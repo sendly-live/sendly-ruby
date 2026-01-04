@@ -182,6 +182,16 @@ status = client.messages.get_batch("batch_xxx")
 
 # List all batches
 batches = client.messages.list_batches
+
+# Preview batch (dry run) - validates without sending
+preview = client.messages.preview_batch(
+  messages: [
+    { to: '+15551234567', text: 'Hello User 1!' },
+    { to: '+447700900123', text: 'Hello UK!' }
+  ]
+)
+puts "Total credits needed: #{preview.total_credits}"
+puts "Valid: #{preview.valid}, Invalid: #{preview.invalid}"
 ```
 
 ### Iterate All Messages
@@ -256,6 +266,17 @@ result = client.account.list_api_keys
 result.data.each do |key|
   puts "#{key.name}: #{key.prefix}*** (#{key.type})"
 end
+
+# Create a new API key
+new_key = client.account.create_api_key(
+  name: 'Production Key',
+  type: 'live',
+  scopes: ['sms:send', 'sms:read']
+)
+puts "New key: #{new_key.key}"  # Only shown once!
+
+# Revoke an API key
+client.account.revoke_api_key('key_xxx')
 ```
 
 ## Error Handling
