@@ -8,13 +8,13 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "Official Ruby SDK for the Sendly SMS API"
   spec.description   = "Send SMS messages globally with the Sendly API. Features include automatic retries, rate limiting, and comprehensive error handling."
-  spec.homepage      = "https://github.com/sendly-live/sendly-ruby"
+  spec.homepage      = "https://github.com/SendlyHQ/sendly-ruby"
   spec.license       = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/sendly-live/sendly-ruby"
-  spec.metadata["changelog_uri"] = "https://github.com/sendly-live/sendly-ruby/blob/main/CHANGELOG.md"
+  spec.metadata["source_code_uri"] = "https://github.com/SendlyHQ/sendly-ruby"
+  spec.metadata["changelog_uri"] = "https://github.com/SendlyHQ/sendly-ruby/blob/main/CHANGELOG.md"
   spec.metadata["documentation_uri"] = "https://sendly.live/docs"
 
   spec.files = Dir.chdir(__dir__) do
