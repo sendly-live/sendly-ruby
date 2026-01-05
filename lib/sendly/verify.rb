@@ -104,7 +104,12 @@ module Sendly
       body[:locale] = locale if locale
       body[:metadata] = metadata if metadata
 
-      response = @client.post("/verify/send", body)
+      response = @client.post("/verify", body)
+      SendVerificationResponse.new(response)
+    end
+
+    def resend(id)
+      response = @client.post("/verify/#{id}/resend")
       SendVerificationResponse.new(response)
     end
 
