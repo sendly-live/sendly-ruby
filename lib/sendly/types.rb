@@ -52,7 +52,7 @@ module Sendly
     attr_reader :delivered_at
 
     # Message status constants (sending removed - doesn't exist in database)
-    STATUSES = %w[queued sent delivered failed].freeze
+    STATUSES = %w[queued sent delivered failed bounced].freeze
 
     # Sender type constants
     SENDER_TYPES = %w[number_pool alphanumeric sandbox].freeze
